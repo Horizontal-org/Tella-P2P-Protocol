@@ -235,4 +235,4 @@ errors:
 |401|Invalid session ID|
 |403|Session already closed|
 |500|Server error|
-````
+
