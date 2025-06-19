@@ -27,7 +27,7 @@ The host displays a QR code containing:
 * Host's full list of local IP addresses
 * Connection PIN
 * port
-* Hash of the tls certificate
+* SHA-256 Hash of the tls certificate
 
 QR payload:
 
@@ -55,7 +55,7 @@ After entering the information, both the sender and receiver will show a verific
 * confirm and connect - Proceeds with registration if the hashes match
 * discard and start over - terminates connection and returns to initial state
 
-Example of alphanumeric sequence:
+Example of alphanumeric sequence (SHA-256 hash):
 
 ```markdown
 87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
