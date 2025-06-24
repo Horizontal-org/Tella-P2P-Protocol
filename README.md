@@ -178,7 +178,9 @@ Response Payload
 
 Request payload
 
-```raw-binary-data
+```
+raw-binary-data
+
 ```
 
 Response payload
