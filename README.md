@@ -173,17 +173,12 @@ Response Payload
 
 ### File Upload
 
-`POST /api/v1/upload`
+`POST /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
+
 
 Request payload
 
-```json5
-{
-  "sessionId": "uuid-session-identifier",
-  "transmissionId": "uuid-transmission-identifier",
-  "fileId": "file-uuid",
-  "data": "raw-binary-data"
-}
+```raw-binary-data
 ```
 
 Response payload
