@@ -167,7 +167,12 @@ Response Payload
 
 ```json5
 {
-  "transmissionId": "uuid-transmission-identifier"
+  "files": [
+    {
+      "id": "file-uuid",
+      "transmissionId": "uuid-transmission-identifier"
+    }
+  ]
 }
 ```
 
