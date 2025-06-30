@@ -69,7 +69,7 @@ Security Note: Hash missmatch indicate a potential man-in-the-middle attack. Use
 
 `POST /api/v1/ping`
 
-used before the register to perform a secure handshake between two devices.
+This endpoint initiates a secure handshake between two devices during a manual connection process. It is used prior to register. 
 
 ### 4.2- Initial Registration
 
@@ -103,7 +103,6 @@ response payload
 |--|--|
 |400|Invalid request format|
 |401|Invalid PIN|
-|403|Invalid encryption/decryption|
 |409|Active session already exists|
 |429|Too many requests|
 |500|Server error|
@@ -115,20 +114,30 @@ response payload
 - Device B scans QR code with:
     - Device's A IP address
     - PIN
-- Device B (sender) sends a ping to `/api/v1/ping`
-- handshake is executed between device B and device A
+    - Port
+    - Certificate Hash
 - Device B (sender)  sends the payload to `/api/v1/register`
 - Device A (recipient)  receives payload
 - Device A returns the `uuid-session-identifier`
 
-During this handshake we compare automatically the hashes
-
+The hashes are automatically compared between the Certificate Hash provided in the QR code and the one received from the server.
 
 **Manual Method:**
 
-- Device B Type manually the ip address, PIN and PORT
-- proceeds with normal registration
-- we will prompt on both devices the hashes and let the users compare it manually
+Initial Ping:
+- Device B (sender) manually types the IP address, PIN, and PORT
+- Device B (sender) sends a ping to `/api/v1/ping`
+- Device B (sender) retrieves the Certificate Hash from server 
+- Device B (sender) shows the Certificate Hash to be compared  
+- Device A (recipient) show the Certificate Hash when receive a `/api/v1/ping` request     
+    
+Initial Registration:
+- Device B (sender) confirms the Certificate Hash and sends the payload to `/api/v1/register`
+- Device A (recipient) receives payload
+- Device A (recipient) confirms the register request     
+- Device A (recipient) returns the `uuid-session-identifier`
+
+
 
 ## 5- File Transfer
 
@@ -158,7 +167,12 @@ Response Payload
 
 ```json5
 {
-  "transmissionId": "uuid-transmission-identifier"
+  "files": [
+    {
+      "id": "file-uuid",
+      "transmissionId": "uuid-transmission-identifier"
+    }
+  ]
 }
 ```
 
@@ -173,17 +187,14 @@ Response Payload
 
 ### File Upload
 
-`POST /api/v1/upload`
+`POST /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
+
 
 Request payload
 
-```json5
-{
-  "sessionId": "uuid-session-identifier",
-  "transmissionId": "uuid-transmission-identifier",
-  "fileId": "file-uuid",
-  "data": "raw-binary-data"
-}
+```
+raw-binary-data
+
 ```
 
 Response payload
