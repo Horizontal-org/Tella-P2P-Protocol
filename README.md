@@ -157,7 +157,8 @@ Request Payload
       "fileName": "document.pdf",
       "size": 324242,
       "fileType": "application/pdf",
-      "sha256": "file-hash"
+      "sha256": "file-hash",
+      "thumbnail": "thumbnail-data"
     }
   ]
 }
