@@ -187,7 +187,7 @@ Response Payload
 
 ### File Upload
 
-`POST /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
+`PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
 
 
 Request payload
