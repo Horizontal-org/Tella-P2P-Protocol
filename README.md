@@ -69,6 +69,7 @@ This endpoint initiates a secure handshake between two devices during the manual
 ### 3.2- Initial Registration
 
 For QR code authentication, it is performed immediately after the QR code has been scanned.
+
 For manual authentication, it is performed after the ping request and once the sender has verified the certificate hash.
 
 `POST /api/v1/register`
@@ -93,7 +94,7 @@ Response payload
 
 **Note:** A maximum of 3 invalid requests are allowed
 
-**Errors**:
+Errors:
 
 |HTTP code|Message|
 |--|--|
@@ -104,7 +105,7 @@ Response payload
 |429|Too many requests|
 |500|Server error|
 
-#### flow
+### Flow
 
 **QR code:**
 
@@ -174,7 +175,7 @@ Response Payload
 }
 ```
 
-**Errors:**
+Errors:
 
 |HTTP code|Message|
 |--|--|
