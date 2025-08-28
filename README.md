@@ -64,11 +64,12 @@ Security Note: Hash missmatch indicate a potential man-in-the-middle attack. Use
 
 `POST /api/v1/ping`
 
-This endpoint initiates a secure handshake between two devices during a manual connection process. It is used prior to register. 
+This endpoint initiates a secure handshake between two devices during the manual connection process. It must be called before the register endpoint. Once called, both the sender and receiver display the verification screen.
 
 ### 3.2- Initial Registration
 
-should perform instantly after the ping request
+It should be performed after the ping request and once the sender has verified the certificate hash.
+
 
 `POST /api/v1/register`
 
