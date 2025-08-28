@@ -5,22 +5,17 @@ A secure, offline peer-to-peer file sharing protocol designed for Tella applicat
 
 ## 1- Security Features
 
-* All connections use HTTPS with per-device generated self-signed certificates
-* Mandatory authentication via PIN and connect code or QR code scanning
-* verification of certificate to prevent MITM attacks
+* All connections are secured with HTTPS using self-signed certificates generated per device.
+* Authentication is mandatory via PIN and IP address, provided through QR code scanning or manual entry.
+* Certificates are verified to prevent man-in-the-middle (MITM) attacks
+* All connections use a specific port : 53317
 
-## 2- Defaults
 
-**HTTP/HTTPS (TCP)**
+## 2- Connection Authentication
 
-* Default Port: 53317
-* Alternative ports: User configurable if default is unavailable
+All connections require authentication via QR code or Manual :
 
-## 3- Connection Authentication
-
-All connections require authentication via one of these methods:
-
-### 3.1- QR authentication (primary method)
+### 2.1- QR authentication (primary method)
 
 The host displays a QR code containing:
 
@@ -40,7 +35,7 @@ QR payload:
 }
 ```
 
-### 3.2- Manual Authentication (Fallback Method)
+### 2.2- Manual Authentication (Fallback Method)
 
 For scenarios where QR scanning isn't possible:
 
@@ -63,15 +58,15 @@ Example of alphanumeric sequence:
 
 Security Note: Hash missmatch indicate a potential man-in-the-middle attack. Users should verify they are connecting to the correct device and check network security before retrying
 
-## 4- Connection Establishment
+## 3- Connection Establishment
 
-### 4.1 Initial Ping
+### 3.1 Initial Ping
 
 `POST /api/v1/ping`
 
 This endpoint initiates a secure handshake between two devices during a manual connection process. It is used prior to register. 
 
-### 4.2- Initial Registration
+### 3.2- Initial Registration
 
 should perform instantly after the ping request
 
@@ -140,7 +135,7 @@ Initial Registration:
 
 
 
-## 5- File Transfer
+## 4- File Transfer
 
 ### Prepare Upload
 
