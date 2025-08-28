@@ -47,8 +47,8 @@ For scenarios where QR scanning isn't possible:
 
 After entering the information, both the sender and receiver will show a verification screen including an alphanumeric sequence (encoding the hash of the tls certificate) and will be prompted to verify if the same sequence is shown in both sides. There will be 2 buttons
 
-* confirm and connect - Proceeds with registration if the hashes match
-* discard and start over - terminates connection and returns to initial state
+* Confirm and connect - Proceeds with registration if the hashes match
+* Discard and start over - terminates connection and returns to initial state
 
 Example of alphanumeric sequence:
 
@@ -107,34 +107,35 @@ Errors:
 
 ### Flow
 
-**QR code:**
+Let’s consider Device A as the sender and Device B as the recipient
 
-- Device B scans QR code with:
-    - Device's A IP address
+**QR Code Method:**
+
+- Device A (sender) scans the QR code containing:
+    - Device B's IP address
     - PIN
     - Port
     - Certificate Hash
-- Device B (sender)  sends the payload to `/api/v1/register`
-- Device A (recipient)  receives payload
-- Device A returns the `uuid-session-identifier`
+- Device A (sender) sends the payload to `/api/v1/register`
+- Device B (recipient) receives the payload
+- Device B (recipient) returns the `sessionId`
 
-The hashes are automatically compared between the Certificate Hash provided in the QR code and the one received from the server.
+The Certificate Hash from the QR code is automatically compared with the hash received from the server.
 
 **Manual Method:**
 
 Initial Ping:
-- Device B (sender) manually types the IP address, PIN, and PORT
-- Device B (sender) sends a ping to `/api/v1/ping`
-- Device B (sender) retrieves the Certificate Hash from server 
-- Device B (sender) shows the Certificate Hash to be compared  
-- Device A (recipient) show the Certificate Hash when receive a `/api/v1/ping` request     
+- Device A (sender) manually types the IP address, PIN, and PORT
+- Device A (sender) sends a ping to `/api/v1/ping`
+- Device A (sender) retrieves the Certificate Hash from server 
+- Device A (sender) displays the Certificate Hash to be compared  
+- Device B (recipient) displays the Certificate Hash upon receiving the `/api/v1/ping` request     
     
 Initial Registration:
-- Device B (sender) confirms the Certificate Hash and sends the payload to `/api/v1/register`
-- Device A (recipient) receives payload
-- Device A (recipient) confirms the register request     
-- Device A (recipient) returns the `uuid-session-identifier`
-
+- After confirming the Certificate Hash, Device A (sender) sends the payload to `/api/v1/register`
+- Device B (recipient) receives the payload
+- Device B (recipient) confirms the registration request     
+- Device B (recipient) returns the `sessionId`
 
 
 ## 4- File Transfer
