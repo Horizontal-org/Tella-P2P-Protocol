@@ -13,15 +13,15 @@ A secure, offline peer-to-peer file sharing protocol designed for Tella applicat
 
 ## 2- Connection Authentication
 
-All connections require authentication via QR code or Manual :
+All connections require authentication, either via QR code or manually
 
 ### 2.1- QR authentication (primary method)
 
 The host displays a QR code containing:
 
-* Host's full list of local IP addresses
+* Host's IP addresses
 * Connection PIN
-* port
+* Port
 * Hash of the tls certificate
 
 QR payload:
@@ -35,7 +35,7 @@ QR payload:
 }
 ```
 
-### 2.2- Manual Authentication (Fallback Method)
+### 2.2- Manual authentication (Fallback Method)
 
 For scenarios where QR scanning isn't possible:
 
@@ -43,7 +43,7 @@ For scenarios where QR scanning isn't possible:
 
 * IP address
 * 6 digit PIN
-* Port number (format XXX)
+* Port number 
 
 After entering the information, both the sender and receiver will show a verification screen including an alphanumeric sequence (encoding the hash of the tls certificate) and will be prompted to verify if the same sequence is shown in both sides. There will be 2 buttons
 
