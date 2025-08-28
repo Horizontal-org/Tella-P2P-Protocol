@@ -87,7 +87,7 @@ Request payload
 ```
 
 
-response payload
+Response payload
 
 ```markdown
 {
@@ -95,14 +95,15 @@ response payload
 }
 ```
 
-**note: **We should implement a rate limit for the invalid, probably 3 request
+**Note:** A maximum of 3 invalid requests are allowed
 
-**errors**:
+**Errors**:
 
 |HTTP code|Message|
 |--|--|
 |400|Invalid request format|
 |401|Invalid PIN|
+|403|Rejected| 
 |409|Active session already exists|
 |429|Too many requests|
 |500|Server error|
@@ -177,7 +178,7 @@ Response Payload
 }
 ```
 
-**errors:**
+**Errors:**
 
 |HTTP code|Message|
 |--|--|
@@ -206,7 +207,7 @@ Response payload
 }
 ```
 
-errors:
+Errors:
 
 |HTTP code|Message|
 |--|--|
@@ -214,9 +215,6 @@ errors:
 |401|Invalid session ID|
 |403|Invalid transmission ID|
 |409|Transfer already completed|
-|413|File too large|
-|415|Unsupported file type|
-|507|Insufficient storage space|
 |500|Server error|
 
 ### Close Connection
@@ -239,7 +237,7 @@ Response:
 }
 ```
 
-errors:
+Errors:
 
 |HTTP code|Message|
 |--|--|
