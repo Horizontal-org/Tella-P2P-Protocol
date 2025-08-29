@@ -1,7 +1,6 @@
 # Tella P2P Protocol
 
-A secure, offline peer-to-peer file sharing protocol designed for Tella applications. This protocol enables encrypted file transfers between devices without relying on external servers, prioritizing privacy and security for sensitive data exchange.
-
+A secure, offline peer-to-peer file sharing protocol designed for Tella applications. It enables encrypted file transfers directly between devices without relying on external servers, ensuring privacy and security in the exchange of sensitive data.
 
 ## 1- Security Features
 
