@@ -128,7 +128,7 @@ The Certificate Hash from the QR code is automatically compared with the hash re
 **Manual Method:**
 
 Initial Ping:
-- Device A (sender) manually types the IP address, PIN, and PORT
+- Device A (sender) manually types the IP address, PIN, and port
 - Device A (sender) sends a ping to `/api/v1/ping`
 - Device A (sender) retrieves the Certificate Hash from recipient 
 - Device A (sender) displays the Certificate Hash to be compared  
