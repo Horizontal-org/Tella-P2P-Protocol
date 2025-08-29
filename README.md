@@ -18,7 +18,7 @@ All connections require authentication, either via QR code or manually
 
 The host device displays a QR code containing:
 
-* Host's IP addresses
+* Host's local IP address
 * Connection PIN
 * Port
 * Hash of the tls certificate
@@ -49,7 +49,7 @@ Both parties will verify that the same sequence is shown on each device before p
 
 The verification screen will provide two options:
 * Confirm and Connect — Proceed with registration if the hashes match.
-* Discard and Start Over — Terminate the connection and return to the initial state.
+* Discard and Start Over — Terminate the connection and the user should be returned to the main connection screen.
 
 
 Example of alphanumeric sequence:
