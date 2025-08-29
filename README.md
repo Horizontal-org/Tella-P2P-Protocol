@@ -140,7 +140,9 @@ Initial Registration:
 
 ## 4- File Transfer
 
-### Prepare Upload
+### 4.1 Prepare Upload
+
+This request contains only metadata. The receiver decides whether to accept or reject the request
 
 `POST /api/v1/prepare-upload`
 
@@ -156,7 +158,6 @@ Request Payload
       "fileName": "document.pdf",
       "size": 324242,
       "fileType": "application/pdf",
-      "sha256": "file-hash",
       "thumbnail": "thumbnail-data"
     }
   ]
@@ -185,7 +186,9 @@ Errors:
 |403|Rejected|
 |500|Server error|
 
-### File Upload
+### 4.2 File Upload
+
+The file upload requires the sessionId, fileId, and its file-specific transmissionId obtained from /prepare-upload.
 
 `PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
 
@@ -215,7 +218,11 @@ Errors:
 |409|Transfer already completed|
 |500|Server error|
 
-### Close Connection
+### 4.3 Close Connection
+
+This request is sent by the sender to terminate the session.
+
+The `sessionId` is obtained from /prepare-upload.
 
 `POST /api/v1/close-connection`
 
