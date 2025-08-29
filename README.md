@@ -123,14 +123,14 @@ Let’s consider Device A as the sender and Device B as the recipient
 - Device B (recipient) receives the payload
 - Device B (recipient) returns the `sessionId`
 
-The Certificate Hash from the QR code is automatically compared with the hash received from the server.
+The Certificate Hash from the QR code is automatically compared with the hash received from the recipient.
 
 **Manual Method:**
 
 Initial Ping:
 - Device A (sender) manually types the IP address, PIN, and PORT
 - Device A (sender) sends a ping to `/api/v1/ping`
-- Device A (sender) retrieves the Certificate Hash from server 
+- Device A (sender) retrieves the Certificate Hash from recipient 
 - Device A (sender) displays the Certificate Hash to be compared  
 - Device B (recipient) displays the Certificate Hash upon receiving the `/api/v1/ping` request     
     
