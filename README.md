@@ -17,7 +17,7 @@ All connections require authentication, either via QR code or manually
 
 ### 2.1- QR authentication (primary method)
 
-The host displays a QR code containing:
+The host device displays a QR code containing:
 
 * Host's IP addresses
 * Connection PIN
@@ -37,18 +37,21 @@ QR payload:
 
 ### 2.2- Manual authentication (Fallback Method)
 
-For scenarios where QR scanning isn't possible:
-
-**Host displays:**
+When QR code scanning is not available, the host device will display:
 
 * IP address
 * 6 digit PIN
 * Port number 
 
-After entering the information, both the sender and receiver will show a verification screen including an alphanumeric sequence (encoding the hash of the tls certificate) and will be prompted to verify if the same sequence is shown in both sides. There will be 2 buttons
 
-* Confirm and connect - Proceeds with registration if the hashes match
-* Discard and start over - terminates connection and returns to initial state
+After entering the connection information, both the sender and the receiver will display a verification screen containing an alphanumeric sequence that encodes the hash of the TLS certificate.
+
+Both parties will verify that the same sequence is shown on each device before proceeding.
+
+The verification screen will provide two options:
+* Confirm and Connect — Proceed with registration if the hashes match.
+* Discard and Start Over — Terminate the connection and return to the initial state.
+
 
 Example of alphanumeric sequence:
 
@@ -56,7 +59,8 @@ Example of alphanumeric sequence:
 87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
 ```
 
-Security Note: Hash missmatch indicate a potential man-in-the-middle attack. Users should verify they are connecting to the correct device and check network security before retrying
+**Security Note:** A hash mismatch indicates a potential man-in-the-middle (MITM) attack.
+Users should verify that they are connecting to the intended device and ensure the network environment is secure before retrying.
 
 ## 3- Connection Establishment
 
