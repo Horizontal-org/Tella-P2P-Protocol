@@ -1,6 +1,32 @@
-# Tella P2P Protocol
+# Tella Nearby Sharing Protocol
 
-A secure, offline peer-to-peer file sharing protocol designed for Tella applications. It enables encrypted file transfers directly between devices without relying on external servers, ensuring privacy and security in the exchange of sensitive data.
+
+
+Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transferes.
+
+This repository describes the peer-to-peer file sharing protocol implemented by all Tella apps. 
+
+
+## Platform and availability
+Nearby Sharing will be available for [Tella Android](https://github.com/Horizontal-org/Tella-Android), [Tella iOS](https://github.com/Horizontal-org/Tella-iOS) and [Tella Desktop](https://github.com/Horizontal-org/Tella-Desktop), but it's still under development.
+
+The feature is still in alpha, and it's currently being audited by an independent security firm. It will be launched to production only after the priority security fixes are implemented.
+
+User facing documentation about the feature is available here: https://beta.tella-app.org/nearby-sharing
+
+## Credits
+This protocol (and Nearby Sharing feature in Tella in general) is inspired by the [LocalSend project](https://github.com/localsend/localsend), and it uses the local network Wi-Fi without needing an internet connection. 
+
+
+## Context of use and key features
+Nearby Sharing in Tella was designed for contexts of repression and surveilance, including for being able to share sensitive information before, during and after internet shutdowns. Here are some key details:
+
+- Independent of internet: Transfers work with or without an internet connection, even on surveilled or insecure Wi-Fi networks, by establishing a direct connection between devices instead of routing through the internet.
+- Works with Personal Hotspots: even if you don't have data on your phone's plan, you can still create a Personal Hotspot, invite the other person to connect to it, and be able to use Nearby Sharing.
+- Available on iOS, Android and Computer: there isn't any restrictions on which model of phone, brand or operative system you use. Nearby Sharing is designed to be accessible to any device able to install Tella
+- Encrypted: Files move directly from one Tella vault to another, encrypted and secure.
+- Anonymous: There’s no concept of “registered users” in Tella. Nearby Sharing connections happen locally, with no trace of who you shared with, where, or when.
+
 
 ## 1- Security Features
 
