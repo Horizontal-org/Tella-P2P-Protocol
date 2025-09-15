@@ -243,7 +243,7 @@ errors:
 
 |HTTP code|Message|
 |--|--|
-|400|Missing session ID|
+|400|Invalid request format|
 |401|Invalid session ID|
 |403|Session already closed|
 |500|Server error|
