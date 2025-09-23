@@ -78,7 +78,7 @@ The verification screen will provide two options:
 * Discard and Start Over — Terminate the connection and the user should be returned to the main connection screen.
 
 
-Example of alphanumeric sequence:
+Example of alphanumeric sequence (SHA-256 hash):
 
 ```markdown
 87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
@@ -275,7 +275,7 @@ Errors:
 
 |HTTP code|Message|
 |--|--|
-|400|Missing session ID|
+|400|Invalid request format|
 |401|Invalid session ID|
 |403|Session already closed|
 |500|Server error|
