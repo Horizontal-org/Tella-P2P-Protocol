@@ -32,13 +32,14 @@ Nearby Sharing in Tella was designed for contexts of repression and surveillance
 
 * All connections are secured with HTTPS using self-signed certificates generated per device.
 * Authentication is mandatory via PIN and IP address, provided through QR code scanning or manual entry.
-* Certificates are verified to prevent machine-in-the-middle (MITM) attacks
-* All connections use a specific port : 53317
+* Certificates are verified to prevent machine-in-the-middle (MITM) attacks.
+* All connections use a specific port: 53317
 
+To minimize attack surfaces, TLS 1.3 is the only TLS version supported by the protocol.
 
 ## 2- Connection Authentication
 
-All connections require authentication, either via QR code or manually
+All connections require authentication, either via QR code or manually.
 
 ### 2.1- QR authentication (primary method)
 
@@ -94,6 +95,12 @@ Users should verify that they are connecting to the intended device and ensure t
 `POST /api/v1/ping`
 
 This endpoint initiates a secure handshake between two devices during the manual connection process. It must be called before the register endpoint. Once called, both the sender and receiver display the verification screen.
+
+Errors:
+
+|HTTP code|Message|
+|--|--|
+|429|Too many requests|
 
 ### 3.2- Initial Registration
 
@@ -181,11 +188,13 @@ Request Payload
 {
   "title": "Title of the report",
   "sessionId": "uuid-session-identifier",
+  "nonce": "random-uuid-number"
   "files": [
     {
       "id": "file-uuid",
       "fileName": "document.pdf",
       "size": 324242,
+      "sha256": "57bb905d0f2ccecbb9d81d40daa17e1e05b109c833ddc766edb0b59561088f20",
       "fileType": "application/pdf",
       "thumbnail": "thumbnail-data"
     }
@@ -206,6 +215,13 @@ Response Payload
 }
 ```
 
+**Note:** 
+
+1. `sha256` should be the SHA256 hash of the given file, encoded as a hexadecimal (base 16) string.
+2. The maximum allowed size of a single file is XXX (4-12?) GB (xxxxx bytes).
+3. The maximum allowed number of files that can be sent is XXX.
+4. The maximum allowed total upload size (the sum of all files sizes) is XXX (50-100?) GB (xxxxx bytes).
+
 Errors:
 
 |HTTP code|Message|
@@ -213,13 +229,15 @@ Errors:
 |400|Invalid request format|
 |401|Invalid session ID|
 |403|Rejected|
+|413|Content too large|
+|429|Too many requests|
 |500|Server error|
 
 ### 4.2 File Upload
 
 The file upload requires the sessionId, fileId, and its file-specific transmissionId obtained from /prepare-upload.
 
-`PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
+`PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId&nonce=random-uuid-number`
 
 
 Request payload
@@ -245,7 +263,13 @@ Errors:
 |401|Invalid session ID|
 |403|Invalid transmission ID|
 |409|Transfer already completed|
+|413|Content too large|
+|429|Too many requests|
 |500|Server error|
+
+**Note**: 
+1. After a successful upload, the transmissionId should be regarded as used. Any following requests for that transmissionId should return 403 "Invalid tranmission ID".
+2. `nonce` should be a unique nonce (UUID V4) for each upload request. See section **5.2 Replay Protection**.
 
 ### 4.3 Close Connection
 
@@ -278,5 +302,21 @@ Errors:
 |400|Invalid request format|
 |401|Invalid session ID|
 |403|Session already closed|
+|429|Too many requests|
 |500|Server error|
 
+## 5. Rate-limiting and replay protection
+
+### 5.1 Rate-limiting
+
+All routes are rate-limited per IP address, limiting the amount of requests a
+single IP is allowed to make for each route.
+
+If an IP address becomes rate-limited, its requests are ignored and the
+error 429 "Too many requests" sent as response.
+
+### 5.2 Replay Protection
+
+All routes that submit data are guarded against replay attacks by the inclusion
+of a nonce. If a request contains a nonce that has been seen, that request is
+regarded as invalid and is rejected.
