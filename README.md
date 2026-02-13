@@ -2,9 +2,9 @@
 
 
 
-Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transferes.
+Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transfers.
 
-This repository describes the peer-to-peer file sharing protocol implemented by all Tella apps. 
+This repository describes the peer-to-peer file sharing protocol implemented by all [Tella](https://tella-app.org/) apps. 
 
 
 ## Platform and availability
@@ -19,7 +19,7 @@ This protocol (and Nearby Sharing feature in Tella in general) is inspired by th
 
 
 ## Context of use and key features
-Nearby Sharing in Tella was designed for contexts of repression and surveilance, including for being able to share sensitive information before, during and after internet shutdowns. Here are some key details:
+Nearby Sharing in Tella was designed for contexts of repression and surveillance, including for being able to share sensitive information before, during and after internet shutdowns. Here are some key details:
 
 - Independent of internet: Transfers work with or without an internet connection, even on surveilled or insecure Wi-Fi networks, by establishing a direct connection between devices instead of routing through the internet.
 - Works with Personal Hotspots: even if you don't have data on your phone's plan, you can still create a Personal Hotspot, invite the other person to connect to it, and be able to use Nearby Sharing.
@@ -32,7 +32,7 @@ Nearby Sharing in Tella was designed for contexts of repression and surveilance,
 
 * All connections are secured with HTTPS using self-signed certificates generated per device.
 * Authentication is mandatory via PIN and IP address, provided through QR code scanning or manual entry.
-* Certificates are verified to prevent man-in-the-middle (MITM) attacks
+* Certificates are verified to prevent machine-in-the-middle (MITM) attacks
 * All connections use a specific port : 53317
 
 
@@ -47,7 +47,7 @@ The host device displays a QR code containing:
 * Host's local IP address
 * Connection PIN
 * Port
-* Hash of the tls certificate
+* Hash of the TLS certificate
 
 QR payload:
 
@@ -84,7 +84,7 @@ Example of alphanumeric sequence (SHA-256 hash):
 87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
 ```
 
-**Security Note:** A hash mismatch indicates a potential man-in-the-middle (MITM) attack.
+**Security Note:** A hash mismatch indicates a potential machine-in-the-middle (MITM) attack.
 Users should verify that they are connecting to the intended device and ensure the network environment is secure before retrying.
 
 ## 3- Connection Establishment
