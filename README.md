@@ -121,7 +121,7 @@ Response payload
 }
 ```
 
-**Note:** A maximum of 3 invalid requests are allowed
+**Note:** A maximum of 3 invalid requests are allowed.
 
 Errors:
 
@@ -136,7 +136,7 @@ Errors:
 
 ### Flow
 
-Let’s consider Device A as the sender and Device B as the recipient
+Let’s consider Device A as the sender and Device B as the recipient.
 
 **QR Code Method:**
 
@@ -171,7 +171,7 @@ Initial Registration:
 
 ### 4.1 Prepare Upload
 
-This request contains only metadata. The receiver decides whether to accept or reject the request
+This request contains only metadata. The receiver decides whether to accept or reject the request.
 
 `POST /api/v1/prepare-upload`
 
