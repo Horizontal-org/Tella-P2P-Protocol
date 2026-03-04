@@ -49,7 +49,7 @@ The host device displays a QR code containing:
 * Host's local IP address
 * Connection PIN
 * Port
-* Hash of the TLS certificate
+* Hash of the host's TLS certificate
 
 QR payload:
 
@@ -71,7 +71,7 @@ When QR code scanning is not available, the host device will display:
 * Port number 
 
 
-After entering the connection information, both the sender and the receiver will display a verification screen containing an alphanumeric sequence that encodes the hash of the TLS certificate.
+After entering the connection information, both the sender and the receiver will display a verification screen containing an alphanumeric sequence that encodes the hash of the receiver's TLS certificate.
 
 Both parties will verify that the same sequence is shown on each device before proceeding.
 
@@ -105,18 +105,33 @@ Errors:
 
 ### 3.2- Initial Registration
 
-For QR code authentication, it is performed immediately after the QR code has been scanned.
+For QR code authentication, registration is performed immediately after the QR code has been scanned.
 
-For manual authentication, it is performed after the ping request and once the sender has verified the certificate hash.
+For manual authentication, registration is performed after the ping request and once the sender has verified the server certificate hash.
+
+The register payload includes the sender's certificate hash. In this way the protocol
+establishes a mutual TLS (mTLS) connection: the receiver verifies the sender, and the sender
+verifies the receiver. Under mTLS the sender generates a TLS certificate and configures
+their TLS client to attach certificate information to each request.
+
+This further secures the connection by having the recipient "pin" the sender's certificate hash. 
+
+Pinning is done by checking the certificate information attached to each incoming request
+against the certificate hash saved from the register payload. If there is no certificate hash
+on a request or if there is a hash mismatch, the request is rejected. Certificate hashes are
+stored per session and discarded after a session ends.
+
+The sender's certificate hash is only saved after confirming that the register payload PIN
+as valid.
 
 `POST /api/v1/register`
 
 Request payload
 
-```markdown
-{
+```markdown {
   pin: "123456",
   nonce: "random-uuid-number",
+  senderCertificateHash: "sha256-hash-of-sender-TLS-certificate"
 }
 ```
 
@@ -157,7 +172,7 @@ Let’s consider Device A as the sender and Device B as the recipient.
 - Device B (recipient) receives the payload
 - Device B (recipient) returns the `sessionId`
 
-The Certificate Hash from the QR code is automatically compared with the hash received from the recipient.
+The recipient's Certificate Hash from the QR code is automatically compared with the hash received from the recipient.
 
 **Manual Method:**
 
@@ -171,6 +186,7 @@ Initial Ping:
 Initial Registration:
 - After confirming the Certificate Hash, Device A (sender) sends the payload to `/api/v1/register`
 - Device B (recipient) receives the payload
+- Device B (recipient) pins the sender's Certificate Hash from the payload
 - Device B (recipient) confirms the registration request     
 - Device B (recipient) returns the `sessionId`
 
