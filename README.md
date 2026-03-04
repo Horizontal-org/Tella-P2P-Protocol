@@ -35,7 +35,8 @@ Nearby Sharing in Tella was designed for contexts of repression and surveillance
 * Certificates are verified to prevent machine-in-the-middle (MITM) attacks.
 * All connections use a specific port: 53317
 
-To minimize attack surfaces, TLS 1.3 is the only TLS version supported by the protocol.
+The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest version
+supported by both sender and receiver.
 
 ## 2- Connection Authentication
 
@@ -218,9 +219,6 @@ Response Payload
 **Note:** 
 
 1. `sha256` should be the SHA256 hash of the given file, encoded as a hexadecimal (base 16) string.
-2. The maximum allowed size of a single file is XXX (4-12?) GB (xxxxx bytes).
-3. The maximum allowed number of files that can be sent is XXX.
-4. The maximum allowed total upload size (the sum of all files sizes) is XXX (50-100?) GB (xxxxx bytes).
 
 Errors:
 
