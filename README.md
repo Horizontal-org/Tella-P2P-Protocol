@@ -55,12 +55,15 @@ QR payload:
 
 ```json5
 {
-  ip_address: String,
+  ip_address: [String, ..., ..., String],
   port: Number,
   certificate_hash: String,
   pin: String
 }
 ```
+
+**Note:** `ip_address` is a list of strings, as the receiver may have many different local IP
+addresses.
 
 ### 2.2- Manual authentication (Fallback Method)
 
