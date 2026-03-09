@@ -33,7 +33,7 @@ Nearby Sharing in Tella was designed for contexts of repression and surveillance
 * All connections are secured with HTTPS using self-signed certificates generated per device.
 * Authentication is mandatory via PIN and IP address, provided through QR code scanning or manual entry.
 * Certificates are verified to prevent machine-in-the-middle (MITM) attacks.
-* All connections use a specific port: 53317
+* All connections use a specific port: 53320
 
 The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest version
 supported by both sender and receiver.
