@@ -246,7 +246,6 @@ Errors:
 |400|Invalid request format|
 |401|Invalid session ID|
 |403|Rejected|
-|413|Content too large|
 |429|Too many requests|
 |500|Server error|
 
