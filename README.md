@@ -157,6 +157,7 @@ Errors:
 |401|Invalid PIN|
 |403|Rejected| 
 |409|Active session already exists|
+|413|Content too large|
 |429|Too many requests|
 |500|Server error|
 
@@ -282,6 +283,7 @@ Errors:
 |413|Content too large|
 |429|Too many requests|
 |500|Server error|
+|507|Insufficient storage space|
 
 **Note**: 
 1. After a successful upload, the transmissionId should be regarded as used. Any following requests for that transmissionId should return 403 "Invalid tranmission ID".
