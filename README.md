@@ -184,7 +184,7 @@ Errors:
     - Receiver Certificate Hash
     - PIN
 - Device A (sender) pins Receiver Certificate Hash
-- Device A (sender) sends the payload to `/api/v1/register`:
+- Device A (sender) sends a payload to `/api/v1/register` containing:
     - Sender Certificate Hash
     - PIN
     - Nonce
