@@ -39,7 +39,7 @@ The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest 
 supported by both sender and receiver.
 
 TLS certificates are generated and used on both sides of the connection to
-establish a mutual TLS (mTLS) connection: the sender verifies the sender, and
+establish a mutual TLS (mTLS) connection: the sender verifies the receiver, and
 the receiver verifies the sender. 
 
 Certificate are generated and used per session, being discarded when a session ends.
