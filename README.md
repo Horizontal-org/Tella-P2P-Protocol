@@ -38,11 +38,9 @@ Nearby Sharing in Tella was designed for contexts of repression and surveillance
 The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest version
 supported by both sender and receiver.
 
-TLS certificates are generated and used on both sides of the connection to
-establish a mutual TLS (mTLS) connection: the sender verifies the receiver, and
-the receiver verifies the sender. 
+The receiver generates a self-signed TLS certificate which is used to secure all uploaded files. The sender verifies and pins a hash of the receiver's certificate before any uploads happen. 
 
-Certificate are generated and used per session, being discarded when a session ends.
+Certificates are generated and used per session, being discarded when a session ends.
 
 ## 2- Connection Authentication
 
@@ -105,9 +103,6 @@ Example of alphanumeric sequence (SHA-256 hash):
 87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
 ```
 
-This same verification flow is re-used to confirm the sender certificate hash
-received in the register payload.
-
 **Security Note:** A hash mismatch indicates a potential machine-in-the-middle (MITM) attack.
 Users should verify that they are connecting to the intended device and ensure the network environment is secure before retrying.
 
@@ -131,12 +126,6 @@ For QR code authentication, registration is performed immediately after the QR c
 
 For manual authentication, registration is performed after the ping request and once the sender has verified the receiver certificate hash.
 
-The sender should only generate one certificate and use that certificate for
-both setting the register payload's `senderCertificateHash` and for configuring
-the sender's TLS client.
-
-**Note**: Sender only needs to attach certificate information to requests that happen after registration.
-
 If a request's connection has no certificate information or if the computed
 certificate hash does not match the pinned hash, the request should be rejected. 
 
@@ -146,7 +135,6 @@ Request payload
 
 ```markdown 
 {
-  senderCertificateHash: "sha256-hash-of-sender-TLS-certificate",
   pin: "123456",
   nonce: "random-uuid-number",
 }
@@ -185,13 +173,10 @@ Errors:
     - PIN
 - Device A (sender) pins Receiver Certificate Hash
 - Device A (sender) sends a payload to `/api/v1/register` containing:
-    - Sender Certificate Hash
     - PIN
     - Nonce
-- Device A (sender) displays the Sender Certificate Hash to be compared 
 - Device B (recipient) receives the payload
-- Device B (recipient) displays the Sender Certificate Hash from register payload
-- Device B (recipient) checks PIN code is valid and pins Sender Certificate Hash from payload
+- Device B (recipient) checks PIN code is valid 
 - Device B (recipient) returns the `sessionId`
 
 After Device A (sender) has pinned Receiver Certificate Hash from the QR code,
@@ -199,18 +184,6 @@ Device A (sender) will independently compute each certificate hash on future res
 sent from Device B (recipient). For each response sent by Device B (recipient),
 Device A (sender) hashes the certificate from the connection and checks the
 computed hash against the Receiver Certificate Hash pinned from the QR code.
-
-Device B (recipient) saves the Sender Certificate Hash after:
-
-1. Confirming the register payload PIN code is valid, and 
-2. Device B (receiver) has visually verified Device A (sender)'s certificate hash by comparing
-   the hash displayed on Device B (recipient) with the hash displayed on Device A (sender) (**2.3- Verification screen**).
-
-After Device B (recipient) has pinned Sender Certificate Hash from the register
-payload, Device B (recipient) will compute each certificate hash on future requests
-sent from Device A (sender). For each request sent after register, Device B
-(recipient) hashes the certificate from the connection and checks the computed
-hash against the Sender Certificate Hash pinned from the register payload.
 
 **Manual Method:**
 
@@ -223,13 +196,10 @@ Initial Ping:
     
 Initial Registration:
 - After confirming the Receiver Certificate Hash, Device A (sender) sends the payload to `/api/v1/register`
-    - Sender Certificate Hash
     - PIN
     - Nonce
-- Device A (sender) displays the Sender Certificate Hash to be compared 
 - Device B (recipient) receives the payload
-- Device B (recipient) displays the Sender Certificate Hash from register payload
-- Device B (recipient) checks PIN code is valid and pins Sender Certificate Hash from payload
+- Device B (recipient) checks PIN code is valid
 - Device B (recipient) returns the `sessionId`
 
 ## 4- File Transfer
