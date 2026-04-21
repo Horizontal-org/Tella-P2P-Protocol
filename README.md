@@ -2,9 +2,9 @@
 
 
 
-Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transferes.
+Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transfers.
 
-This repository describes the peer-to-peer file sharing protocol implemented by all Tella apps. 
+This repository describes the peer-to-peer file sharing protocol implemented by all [Tella](https://tella-app.org/) apps. 
 
 
 ## Platform and availability
@@ -19,7 +19,7 @@ This protocol (and Nearby Sharing feature in Tella in general) is inspired by th
 
 
 ## Context of use and key features
-Nearby Sharing in Tella was designed for contexts of repression and surveilance, including for being able to share sensitive information before, during and after internet shutdowns. Here are some key details:
+Nearby Sharing in Tella was designed for contexts of repression and surveillance, including for being able to share sensitive information before, during and after internet shutdowns. Here are some key details:
 
 - Independent of internet: Transfers work with or without an internet connection, even on surveilled or insecure Wi-Fi networks, by establishing a direct connection between devices instead of routing through the internet.
 - Works with Personal Hotspots: even if you don't have data on your phone's plan, you can still create a Personal Hotspot, invite the other person to connect to it, and be able to use Nearby Sharing.
@@ -32,33 +32,50 @@ Nearby Sharing in Tella was designed for contexts of repression and surveilance,
 
 * All connections are secured with HTTPS using self-signed certificates generated per device.
 * Authentication is mandatory via PIN and IP address, provided through QR code scanning or manual entry.
-* Certificates are verified to prevent man-in-the-middle (MITM) attacks
-* All connections use a specific port : 53317
+* Certificates are verified to prevent machine-in-the-middle (MITM) attacks.
+* All connections use a specific port: 53320
 
+The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest version
+supported by both sender and receiver.
+
+The receiver generates a self-signed TLS certificate which is used to secure all uploaded files. The sender verifies and pins a hash of the receiver's certificate before any uploads happen. 
+
+Certificates are generated and used per session, being discarded when a session ends.
 
 ## 2- Connection Authentication
 
-All connections require authentication, either via QR code or manually
+All connections require authentication, either via QR code or manually.
+
+As part of authentication, the receiver assigns a session ID and returns it to
+the sender. The session ID lets the receiver know that requests are authorized.
+A given session ID is tied to a particular transfer session. The session ID
+should be forgotten once the transfer concludes, whether it ends orderly or due
+to an error state.
+
+Requests for unknown or concluded transfer sessions should be rejected.
 
 ### 2.1- QR authentication (primary method)
 
 The host device displays a QR code containing:
 
 * Host's local IP address
-* Connection PIN
 * Port
-* Hash of the tls certificate
+* Hash of the host's TLS certificate
+* Connection PIN
 
 QR payload:
 
 ```json5
 {
-  ip_address: String,
+  ip_address: [String, ..., ..., String],
   port: Number,
   certificate_hash: String,
   pin: String
 }
 ```
+
+**Note:** `ip_address` is a list of strings, as the receiver may have many different local IP
+addresses.
 
 ### 2.2- Manual authentication (Fallback Method)
 
@@ -68,8 +85,11 @@ When QR code scanning is not available, the host device will display:
 * 6 digit PIN
 * Port number 
 
+After entering the connection information, both the sender and the receiver will display a verification screen. 
 
-After entering the connection information, both the sender and the receiver will display a verification screen containing an alphanumeric sequence that encodes the hash of the TLS certificate.
+### 2.3- Verification screen
+
+Both the sender and the receiver will display a verification screen containing an alphanumeric sequence that encodes the hash of the receiver's TLS certificate.
 
 Both parties will verify that the same sequence is shown on each device before proceeding.
 
@@ -77,14 +97,13 @@ The verification screen will provide two options:
 * Confirm and Connect — Proceed with registration if the hashes match.
 * Discard and Start Over — Terminate the connection and the user should be returned to the main connection screen.
 
-
 Example of alphanumeric sequence (SHA-256 hash):
 
 ```markdown
 87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
 ```
 
-**Security Note:** A hash mismatch indicates a potential man-in-the-middle (MITM) attack.
+**Security Note:** A hash mismatch indicates a potential machine-in-the-middle (MITM) attack.
 Users should verify that they are connecting to the intended device and ensure the network environment is secure before retrying.
 
 ## 3- Connection Establishment
@@ -95,17 +114,26 @@ Users should verify that they are connecting to the intended device and ensure t
 
 This endpoint initiates a secure handshake between two devices during the manual connection process. It must be called before the register endpoint. Once called, both the sender and receiver display the verification screen.
 
+Errors:
+
+|HTTP code|Message|
+|--|--|
+|429|Too many requests|
+
 ### 3.2- Initial Registration
 
-For QR code authentication, it is performed immediately after the QR code has been scanned.
+For QR code authentication, registration is performed immediately after the QR code has been scanned.
 
-For manual authentication, it is performed after the ping request and once the sender has verified the certificate hash.
+For manual authentication, registration is performed after the ping request and once the sender has verified the receiver certificate hash.
+
+If a request's connection has no certificate information or if the computed
+certificate hash does not match the pinned hash, the request should be rejected. 
 
 `POST /api/v1/register`
 
 Request payload
 
-```markdown
+```markdown 
 {
   pin: "123456",
   nonce: "random-uuid-number",
@@ -121,7 +149,7 @@ Response payload
 }
 ```
 
-**Note:** A maximum of 3 invalid requests are allowed
+**Note:** A maximum of 3 invalid requests are allowed.
 
 Errors:
 
@@ -136,42 +164,49 @@ Errors:
 
 ### Flow
 
-Let’s consider Device A as the sender and Device B as the recipient
-
 **QR Code Method:**
 
 - Device A (sender) scans the QR code containing:
     - Device B's IP address
-    - PIN
     - Port
-    - Certificate Hash
-- Device A (sender) sends the payload to `/api/v1/register`
+    - Receiver Certificate Hash
+    - PIN
+- Device A (sender) pins Receiver Certificate Hash
+- Device A (sender) sends a payload to `/api/v1/register` containing:
+    - PIN
+    - Nonce
 - Device B (recipient) receives the payload
+- Device B (recipient) checks PIN code is valid 
 - Device B (recipient) returns the `sessionId`
 
-The Certificate Hash from the QR code is automatically compared with the hash received from the recipient.
+After Device A (sender) has pinned Receiver Certificate Hash from the QR code,
+Device A (sender) will independently compute each certificate hash on future responses
+sent from Device B (recipient). For each response sent by Device B (recipient),
+Device A (sender) hashes the certificate from the connection and checks the
+computed hash against the Receiver Certificate Hash pinned from the QR code.
 
 **Manual Method:**
 
 Initial Ping:
 - Device A (sender) manually types the IP address, PIN, and port
 - Device A (sender) sends a ping to `/api/v1/ping`
-- Device A (sender) retrieves the Certificate Hash from recipient 
-- Device A (sender) displays the Certificate Hash to be compared  
-- Device B (recipient) displays the Certificate Hash upon receiving the `/api/v1/ping` request     
+- Device A (sender) retrieves the Receiver Certificate Hash from recipient 
+- Device A (sender) displays the Receiver Certificate Hash to be compared  
+- Device B (recipient) displays the Receiver Certificate Hash upon receiving the `/api/v1/ping` request
     
 Initial Registration:
-- After confirming the Certificate Hash, Device A (sender) sends the payload to `/api/v1/register`
+- After confirming the Receiver Certificate Hash, Device A (sender) sends the payload to `/api/v1/register`
+    - PIN
+    - Nonce
 - Device B (recipient) receives the payload
-- Device B (recipient) confirms the registration request     
+- Device B (recipient) checks PIN code is valid
 - Device B (recipient) returns the `sessionId`
-
 
 ## 4- File Transfer
 
 ### 4.1 Prepare Upload
 
-This request contains only metadata. The receiver decides whether to accept or reject the request
+This request contains only metadata. The receiver decides whether to accept or reject the request.
 
 `POST /api/v1/prepare-upload`
 
@@ -181,11 +216,13 @@ Request Payload
 {
   "title": "Title of the report",
   "sessionId": "uuid-session-identifier",
+  "nonce": "random-uuid-number"
   "files": [
     {
       "id": "file-uuid",
       "fileName": "document.pdf",
       "size": 324242,
+      "sha256": "57bb905d0f2ccecbb9d81d40daa17e1e05b109c833ddc766edb0b59561088f20",
       "fileType": "application/pdf",
       "thumbnail": "thumbnail-data"
     }
@@ -206,6 +243,10 @@ Response Payload
 }
 ```
 
+**Note:** 
+
+1. `sha256` should be the SHA256 hash of the given file, encoded as a hexadecimal (base 16) string.
+
 Errors:
 
 |HTTP code|Message|
@@ -213,14 +254,15 @@ Errors:
 |400|Invalid request format|
 |401|Invalid session ID|
 |403|Rejected|
+|413|Content too large|
+|429|Too many requests|
 |500|Server error|
 
 ### 4.2 File Upload
 
 The file upload requires the sessionId, fileId, and its file-specific transmissionId obtained from /prepare-upload.
 
-`PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId`
-
+`PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId&nonce=random-uuid-number`
 
 Request payload
 
@@ -245,7 +287,14 @@ Errors:
 |401|Invalid session ID|
 |403|Invalid transmission ID|
 |409|Transfer already completed|
+|413|Content too large|
+|429|Too many requests|
 |500|Server error|
+|507|Insufficient storage space|
+
+**Note**: 
+1. After a successful upload, the transmissionId should be regarded as used. Any following requests for that transmissionId should return 403 "Invalid tranmission ID".
+2. `nonce` should be a unique nonce (UUID V4) for each upload request and tied to each session. See section **5.2 Replay Protection**.
 
 ### 4.3 Close Connection
 
@@ -278,5 +327,35 @@ Errors:
 |400|Invalid request format|
 |401|Invalid session ID|
 |403|Session already closed|
+|429|Too many requests|
 |500|Server error|
 
+## 5. Rate-limiting and replay protection
+
+### 5.1 Rate-limiting
+
+All routes are rate-limited per IP address, limiting the amount of requests a
+single IP is allowed to make for each route.
+
+If an IP address becomes rate-limited, its request contents should be ignored
+and the error 429 "Too many requests" sent as response.
+
+### 5.2 Replay Protection
+
+All routes that submit data during a session are guarded against replay attacks
+by the inclusion of a nonce. Nonces are associated with a particular transfer
+session. 
+
+A request whose `sessionID` does not match the session ID of an ongoing transfer
+session is an invalid request and should be rejected. A request containing a
+nonce that has already been handled in an ongoing transfer session is regarded
+as invalid and should be rejected.
+
+The above can be modeled as the following pseudocode:
+
+```
+// `seen` is a map operated by the receiver with string keys and boolean values
+if !sessionValid(request.sessionID) || seen[request.nonce] {
+    reject(request)
+}
+``` 
