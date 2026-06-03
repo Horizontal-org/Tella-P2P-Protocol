@@ -38,7 +38,10 @@ Nearby Sharing in Tella was designed for contexts of repression and surveillance
 The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest version
 supported by both sender and receiver.
 
-The receiver generates a self-signed TLS certificate which is used to secure all uploaded files. The sender verifies and pins a hash of the receiver's certificate before any uploads happen. 
+
+Self-signed TLS certificates are generated and used on both sides of the connection to
+establish a mutual TLS (mTLS) connection: the sender verifies the receiver, and
+the receiver verifies the sender.
 
 Certificates are generated and used per session, being discarded when a session ends.
 
@@ -56,12 +59,15 @@ Requests for unknown or concluded transfer sessions should be rejected.
 
 ### 2.1- QR authentication (primary method)
 
-The host device displays a QR code containing:
+#### 2.1.1 Receiver QR code
 
-* Host's local IP address
+The receiver device displays a QR code containing:
+
+* Receiver's local IP address
 * Port
-* Hash of the host's TLS certificate
+* Hash of the receiver's TLS certificate
 * Connection PIN
+* Protocol version number
 
 QR payload:
 
@@ -70,16 +76,31 @@ QR payload:
   ip_address: [String, ..., ..., String],
   port: Number,
   certificate_hash: String,
-  pin: String
+  pin: String,
+  protocol_version: Number
 }
 ```
 
 **Note:** `ip_address` is a list of strings, as the receiver may have many different local IP
 addresses.
 
+#### 2.1.2 Sender QR code
+
+The sender device displays a QR code containing:
+
+* Hash of the sender's TLS certificate
+
+QR payload:
+
+```json5
+{
+  certificate_hash: String
+}
+```
+
 ### 2.2- Manual authentication (Fallback Method)
 
-When QR code scanning is not available, the host device will display:
+When QR code scanning is not available, the receiver device will display:
 
 * IP address
 * 6 digit PIN
@@ -100,7 +121,10 @@ The verification screen will provide two options:
 Example of alphanumeric sequence (SHA-256 hash):
 
 ```markdown
-87fd 5869 a6b3 e414 112c 1934 ca00 be77 b8e4 584c 829a 4536 490b da9a 3928 be4a
+87fd 5869 a6b3 e414 
+112c 1934 ca00 be77 
+b8e4 584c 829a 4536 
+490b da9a 3928 be4a
 ```
 
 **Security Note:** A hash mismatch indicates a potential machine-in-the-middle (MITM) attack.
@@ -110,7 +134,7 @@ Users should verify that they are connecting to the intended device and ensure t
 
 ### 3.1 Initial Ping
 
-`POST /api/v1/ping`
+`POST /api/v2/ping`
 
 This endpoint initiates a secure handshake between two devices during the manual connection process. It must be called before the register endpoint. Once called, both the sender and receiver display the verification screen.
 
@@ -126,10 +150,15 @@ For QR code authentication, registration is performed immediately after the QR c
 
 For manual authentication, registration is performed after the ping request and once the sender has verified the receiver certificate hash.
 
-If a request's connection has no certificate information or if the computed
-certificate hash does not match the pinned hash, the request should be rejected. 
+The sender should only generate one certificate and use that certificate for configuring the sender's TLS client.
 
-`POST /api/v1/register`
+**Note**: Sender needs to attach its certificate information to the registration request and then to all subsequent requests.
+
+If a request's connection has no certificate information or if a computed certificate hash
+does not match the pinned hash, the request should be rejected. The same applies to the
+receiver's responses.
+
+`POST /api/v2/register`
 
 Request payload
 
@@ -162,7 +191,62 @@ Errors:
 |429|Too many requests|
 |500|Server error|
 
-### Flow
+#### New flow
+
+For this flow we use the notation Device A (sender) and Device B (receiver).
+
+**Step 1: Pin receiver certificate**
+
+When sender can scan QR codes: 
+
+* Device B (receiver) presents QR code containing information outlined in *2.1.1 Receiver QR code*
+* Device A (sender) scans QR code, parses information, and pins the embedded Receiver Certificate Hash
+
+When sender cannot scan QR codes (broken screen/camera or comms with desktop):
+
+* Device B (receiver) displays manual connection info outlined in *2.2- Manual authentication (Fallback Method)*
+* Device A (sender) types in manual connection info and sends ping request outlined in *3.1 Initial Ping*
+* Device B (receiver) sends response to ping request
+* Device B (receiver) displays the hash of their TLS certificate
+* Device A (sender) extracts the receiver's certificate information from the connection info for the ping
+  response, hashes it, and displays the Receiver Certificate Hash
+* Device A (sender) and receiver visually compare the hashes as outlined in *2.3- Verification screen*
+* If verification succeds, the sender pins the Receiver Certificate Hash
+* Proceed to step 2
+
+After Device A (sender) has pinned Receiver Certificate Hash, Device A (sender)
+will compute each certificate hash on all future responses. For each response
+received after pinning, Device A (sender) hashes the certificate information
+from the connection and checks the computed hash against the pinned Receiver
+Certificate Hash.
+
+**Step 2: Pin sender certificate**
+
+When receiver can scan QR codes: 
+
+* Device A (sender) presents QR code containing the sender's certificate hash outlined in *2.1.2 Sender QR code*
+* Device B (receiver) scans QR code, parses information, and pins the embedded Sender Certificate Hash
+* Device A (sender) sends register request payload outlined in *3.2- Initial Registration*
+* Device B (receiver) processes registration request, making sure that PIN is correct and nonce has not been seen
+* Finalise registration. Mutual TLS has been established, proceed to *4.1 Prepare upload*
+
+When receiver cannot scan QR codes (broken screen/camera or comms with desktop):
+
+* Device A (sender) sends register request payload outlined in *3.2- Initial Registration*
+* Device A (sender) displays the hash of their TLS certificate
+* Device B (receiver) processes registration request, making sure that PIN is correct and nonce has not
+  been seen (**Note:** this must happen before extracting certificate information in next step)
+* Device B (receiver) extracts the sender's certificate information from the connection info of the registration request, hashes it, and displays the Sender Certificate Hash
+* Device A (sender) and receiver visually compare the hashes as outlined in *2.3- Verification screen*
+* If verification succeds, the receiver pins the Sender Certificate Hash
+* Finalise registration. Mutual TLS has been established, proceed to *4.1 Prepare upload*
+
+After Device B (receiver) has pinned the Sender Certificate Hash, Device B
+(receiver) will compute each certificate hash on all future requests. For each
+request sent after register, Device B (receiver) hashes the certificate information from
+the connection and checks the computed hash against the pinned Sender Certificate Hash.
+
+### Old Flow (section to be removed after new flow is finalised)
 
 **QR Code Method:**
 
@@ -172,7 +256,7 @@ Errors:
     - Receiver Certificate Hash
     - PIN
 - Device A (sender) pins Receiver Certificate Hash
-- Device A (sender) sends a payload to `/api/v1/register` containing:
+- Device A (sender) sends a payload to `/api/v2/register` containing:
     - PIN
     - Nonce
 - Device B (recipient) receives the payload
@@ -189,13 +273,13 @@ computed hash against the Receiver Certificate Hash pinned from the QR code.
 
 Initial Ping:
 - Device A (sender) manually types the IP address, PIN, and port
-- Device A (sender) sends a ping to `/api/v1/ping`
+- Device A (sender) sends a ping to `/api/v2/ping`
 - Device A (sender) retrieves the Receiver Certificate Hash from recipient 
 - Device A (sender) displays the Receiver Certificate Hash to be compared  
-- Device B (recipient) displays the Receiver Certificate Hash upon receiving the `/api/v1/ping` request
+- Device B (recipient) displays the Receiver Certificate Hash upon receiving the `/api/v2/ping` request
     
 Initial Registration:
-- After confirming the Receiver Certificate Hash, Device A (sender) sends the payload to `/api/v1/register`
+- After confirming the Receiver Certificate Hash, Device A (sender) sends the payload to `/api/v2/register`
     - PIN
     - Nonce
 - Device B (recipient) receives the payload
@@ -208,7 +292,7 @@ Initial Registration:
 
 This request contains only metadata. The receiver decides whether to accept or reject the request.
 
-`POST /api/v1/prepare-upload`
+`POST /api/v2/prepare-upload`
 
 Request Payload
 
@@ -262,7 +346,7 @@ Errors:
 
 The file upload requires the sessionId, fileId, and its file-specific transmissionId obtained from /prepare-upload.
 
-`PUT /api/v1/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId&nonce=random-uuid-number`
+`PUT /api/v2/upload?sessionId=sessionId&fileId=fileId&transmissionId=transmissionId&nonce=random-uuid-number`
 
 Request payload
 
@@ -302,7 +386,7 @@ This request is sent by the sender to terminate the session.
 
 The `sessionId` is obtained from /prepare-upload.
 
-`POST /api/v1/close-connection`
+`POST /api/v2/close-connection`
 
 Request Payload
 
