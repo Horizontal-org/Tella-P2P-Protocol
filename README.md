@@ -81,6 +81,9 @@ QR payload:
 }
 ```
 
+For the protocol described in the current document, the protocol version should be set to
+`protocol_version: 2`
+
 **Note:** `ip_address` is a list of strings, as the receiver may have many different local IP
 addresses.
 
