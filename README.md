@@ -210,8 +210,8 @@ When sender cannot scan QR codes (broken screen/camera or comms with desktop):
 * Device B (receiver) displays the hash of their TLS certificate
 * Device A (sender) extracts the receiver's certificate information from the connection info for the ping
   response, hashes it, and displays the Receiver Certificate Hash
-* Device A (sender) and receiver visually compare the hashes as outlined in *2.3- Verification screen*
-* If verification succeds, the sender pins the Receiver Certificate Hash
+* Device A (sender) and Device B (receiver) visually compare the hashes as outlined in *2.3- Verification screen*
+* If verification succeds, Device A (sender) pins the Receiver Certificate Hash
 * Proceed to step 2
 
 After Device A (sender) has pinned Receiver Certificate Hash, Device A (sender)
@@ -237,8 +237,8 @@ When receiver cannot scan QR codes (broken screen/camera or comms with desktop):
 * Device B (receiver) processes registration request, making sure that PIN is correct and nonce has not
   been seen (**Note:** this must happen before extracting certificate information in next step)
 * Device B (receiver) extracts the sender's certificate information from the connection info of the registration request, hashes it, and displays the Sender Certificate Hash
-* Device A (sender) and receiver visually compare the hashes as outlined in *2.3- Verification screen*
-* If verification succeds, the receiver pins the Sender Certificate Hash
+* Device A (sender) and Device B (receiver) visually compare the hashes as outlined in *2.3- Verification screen*
+* If verification succeds, Device B (receiver) pins the Sender Certificate Hash
 * Finalise registration. Mutual TLS has been established, proceed to *4.1 Prepare upload*
 
 After Device B (receiver) has pinned the Sender Certificate Hash, Device B
