@@ -154,9 +154,10 @@ The sender should only generate one certificate and use that certificate for con
 
 **Note**: Sender needs to attach its certificate information to the registration request and then to all subsequent requests.
 
-If a request's connection has no certificate information or if a computed certificate hash
-does not match the pinned hash, the request should be rejected. The same applies to the
-receiver's responses.
+After successful registration, mTLS has been established. This means that requests and
+responses that do not have attached certificate information should be automatically rejected.
+If a computed certificate hash does not match the pinned hash, the coresponding request or
+response should also be rejected.
 
 `POST /api/v2/register`
 
