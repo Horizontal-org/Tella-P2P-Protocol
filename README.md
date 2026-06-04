@@ -68,6 +68,7 @@ The receiver device displays a QR code containing:
 * Hash of the receiver's TLS certificate
 * Connection PIN
 * Protocol version number
+* Whether sender in step 2 of section *New flow* should directly show hash verification
 
 QR payload:
 
@@ -77,9 +78,14 @@ QR payload:
   port: Number,
   certificate_hash: String,
   pin: String,
-  protocol_version: Number
+  protocol_version: Number,
+  sender_show_hash: Booolean
 }
 ```
+
+If for example the receiver is a desktop client, `sender_show_hash` should be set to `true` and
+sender in step 2 in section *New flow* should skip display of the QR code and directly show the
+hash verification screen.
 
 For the protocol described in the current document, the protocol version should be set to
 `protocol_version: 2`
@@ -157,9 +163,9 @@ The sender should only generate one certificate and use that certificate for con
 
 **Note**: Sender needs to attach its certificate information to the registration request and then to all subsequent requests.
 
-After successful registration, mTLS has been established. This means that requests and
+After successful registration, mTLS has been established. After registration, requests and
 responses that do not have attached certificate information should be automatically rejected.
-If a computed certificate hash does not match the pinned hash, the coresponding request or
+Also if a computed certificate hash does not match the pinned hash, the corresponding request or
 response should also be rejected.
 
 `POST /api/v2/register`
