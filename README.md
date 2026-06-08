@@ -1,6 +1,6 @@
 # Tella Nearby Sharing Protocol
 
-
+Protocol version: 2
 
 Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transfers.
 
@@ -453,3 +453,50 @@ if !sessionValid(request.sessionID) || seen[request.nonce] {
     reject(request)
 }
 ``` 
+
+## 6. Version negotation
+
+Offline peer-to-peer protocols provide unique opportunities for enabling long-lasting
+application lifetimes. This presents a difficult in terms of navigating incompatible versions. 
+
+Protocol version 2 is wholly incompatible with version 1 due to the introduction of compulsory mTLS.
+
+### Handling version 1 and version 2 incompatibility
+
+When a receiver or a sender on version 2 detects an incompatibility, they should display the
+Incompatible Versions Message describing that the two clients can't proceed because the other
+client is running an older, incompatible version.
+
+Version 1 and version 2 incompatibility can be detected in the following situations and should be
+reacted to as described:
+
+1. When a version 2 sender scans a version 1 Receiver QR Code, the sender can detect the situation by
+  the lack of `protocol_version` in the Receiver QR Code. As a result, the sender should not
+  send a register request to the receiver. It should instead display the Incompatible Versions
+  Message on the sender's screen with information saying that the receiver is running an
+  older, incompatible version.
+1. A version 2 receiver that receives any requests with the route prefix `/api/v1/` should, if
+   possible, respond with a suitable error code that is known to be implemented by the version
+   1 sender. In particular:
+  1. Requests for `/api/v1/register` should return `403 Rejected` to the version 1 sender. The
+    version 2 receiver should display the Incompatible Versions Message on its screen, saying
+    that the sender was running the older version. This occurs when a version 1 sender scans a
+    version 2 Receiver QR Code.
+  1. Requests for `/api/v1/ping` should be ignored (error code 429 is not suitable). When
+     receiving version 1 ping requests and a mTLS connection has not yet been established, the
+     version 2 receiver should display the Incompatible Versions Message.
+1. A version 2 sender that sends a request to a version 1 sender will send requests to routes
+   with the prefix `/api/v2`. Requests to these routes may not receive any response. This
+   occurs when a version 2 sender tries to manually connect to a version 1 receiver i.e. it
+   concerns the *Initial Ping* used by the manual connection process.
+      * TODO: should the handling behaviour be to have a timeout before displaying "no
+        response; maybe incompatible version?" how do android/ios handle this in v1?
+
+### How version 2 and future versions handle incompatibilities
+
+When a sender scans a Receiver QR code and the value of field `protocol_version` is an
+unsupported version the sender should display the Incompatible Versions Message.
+
+TODO: if we describe how to handle requests for unhandled routes that could allow attacks to
+discover what protocol version (and implicit a range of versions of Tella that may be running)
+a particular receiver is running.
