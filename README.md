@@ -1,6 +1,6 @@
 # Tella Nearby Sharing Protocol
 
-
+Protocol version: 1
 
 Nearby Sharing lets you securely share files, fully offline, across platforms and devices, assuring secure, anonymous, encrypted file transfers.
 
