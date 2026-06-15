@@ -147,11 +147,6 @@ Users should verify that they are connecting to the intended device and ensure t
 
 This endpoint initiates a secure handshake between two devices during the manual connection process. It must be called before the register endpoint. Once called, both the sender and receiver display the verification screen.
 
-**Security note**: Sender should only save the data (senderShowHash) from the
-ping response after Receiver Hash Verification has been completed. Only after
-verifying the Receiver Certificate Hash does sender know they can trust the
-ping response payload.
-
 Response payload
 
 ```markdown
@@ -166,6 +161,11 @@ Errors:
 |--|--|
 |429|Too many requests|
 |406|Unsupported version|
+
+**Security note**: Sender should only save the data (senderShowHash) from the
+ping response after Receiver Hash Verification has been completed. Only after
+verifying the Receiver Certificate Hash does sender know they can trust the
+ping response payload.
 
 ### 3.2- Initial Registration
 
