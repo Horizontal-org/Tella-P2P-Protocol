@@ -222,12 +222,12 @@ For this flow we use the notation Device A (sender) and Device B (receiver).
 
 **Step 1: Pin receiver certificate**
 
-When sender can scan receiver QR codes: 
+When sender can scan Receiver QR code: 
 
 * Device B (receiver) presents QR code containing information outlined in *2.1.1 Receiver QR code*
 * Device A (sender) scans QR code, parses information, and pins the embedded Receiver Certificate Hash
 
-When sender cannot scan receiver QR codes (broken screen/camera or comms with desktop):
+When sender cannot scan Receiver QR code (broken screen/camera or comms with desktop):
 
 * Device B (receiver) displays manual connection info outlined in *2.2- Manual authentication (Fallback Method)*
 * Device A (sender) types in manual connection info and sends ping request outlined in *3.1 Initial Ping*
@@ -247,7 +247,7 @@ Certificate Hash.
 
 **Step 2: Pin sender certificate**
 
-When receiver can scan sender QR codes: 
+When receiver can scan Sender QR code: 
 
 * Device A (sender) presents QR code containing the sender's certificate hash outlined in *2.1.2 Sender QR code*
 * Device B (receiver) scans QR code, parses information, and pins the embedded Sender Certificate Hash
@@ -255,7 +255,7 @@ When receiver can scan sender QR codes:
 * Device B (receiver) processes registration request, making sure that PIN is correct and nonce has not been seen
 * Finalise registration. Mutual TLS has been established, proceed to *4.1 Prepare upload*
 
-When receiver cannot scan sender QR codes (broken screen/camera or comms with desktop):
+When receiver cannot scan Sender QR code (broken screen/camera or comms with desktop):
 
 * Device A (sender) sends register request payload outlined in *3.2- Initial Registration*
 * Device A (sender) displays the hash of their TLS certificate
@@ -285,14 +285,14 @@ information.  This creates the following four scenarios:
 **A: Receiver can scan / Sender can scan (100% QR flow)**
 
 1. Receiver scans Sender QR Code (no requests have been sent). Receiver pins Sender Certificate Hash.
-2. Sender scans Receiver QR Code (still no requests have been sent). Sender pins Receiver Certificate Hash.
+2. Sender scans Receiver QR code (still no requests have been sent). Sender pins Receiver Certificate Hash.
    * mTLS is now established
 3. Sender sends `POST /api/v2/register` (this is request 1)
 
 **B: Receiver cannot scan / Sender can scan flow (Sender Hash Verification)**
 
 1. Receiver marks that they can't scan QR codes
-2. Sender scans Receiver QR Code (no requests have been sent). Sender pins Receiver Certificate Hash.
+2. Sender scans Receiver QR code (no requests have been sent). Sender pins Receiver Certificate Hash.
 3. Sender sends `POST /api/v2/register` (this is request 1)
 4. Receiver confirms PIN correct and nonce unseen. Receiver extracts Sender Certificate Hash from register request.
 5. Sender Hash Verification commences
@@ -547,8 +547,8 @@ For describing senders and receivers on different version, we use the following 
 Version 1 and version 2 incompatibility can be detected in the following situations and should be
 reacted to as described below. 
 
-1. Sender-v2 scans a version 1 Receiver QR Code. The sender can detect the situation by the
-   lack of `protocol_version` in the Receiver QR Code.
+1. Sender-v2 scans a version 1 Receiver QR code. The sender can detect the situation by the
+   lack of `protocol_version` in the Receiver QR code.
 	* Sender should not send a register request to the receiver. 
     * Sender should instead display the Incompatible Versions Message on the screen with
       information saying that the receiver is running an older, incompatible version.
@@ -557,7 +557,7 @@ reacted to as described below.
     1. Requests for `/api/v1/register` should return `403 Rejected` to Sender-v1. Receiver-v2
        should display the Incompatible Versions Message on its screen, saying that the sender
        was running the older version. This occurs when a Sender-v1 scans a version 2
-       Receiver QR Code.
+       Receiver QR code.
     2. Requests for `/api/v1/ping` should be ignored (error code 429 is not suitable). When
      receiving version 1 ping requests and a mTLS connection has not yet been established,
      Receiver-v2 should display the Incompatible Versions Message.
