@@ -70,7 +70,7 @@ The receiver device displays a QR code containing:
 
 * Receiver's local IP address
 * Port
-* Hash of the receiver's TLS certificate
+* Receiver Certificate Hash
 * Connection PIN
 * Protocol version number
 * Whether sender in step 2 of section *New flow* should directly show hash verification
@@ -102,7 +102,7 @@ addresses.
 
 The sender device displays a QR code containing:
 
-* Hash of the sender's TLS certificate
+* Sender Certificate Hash
 
 QR payload:
 
@@ -225,7 +225,7 @@ Errors:
 
 For this flow we use the notation Device A (sender) and Device B (receiver).
 
-**Step 1: Pin receiver certificate**
+**Step 1: Pin Receiver Certificate Hash**
 
 When sender can scan Receiver QR code: 
 
@@ -250,7 +250,7 @@ received after pinning, Device A (sender) hashes the certificate information
 from the connection and checks the computed hash against the pinned Receiver
 Certificate Hash.
 
-**Step 2: Pin sender certificate**
+**Step 2: Pin Sender Certificate Hash**
 
 When receiver can scan Sender QR code: 
 
