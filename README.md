@@ -79,7 +79,7 @@ QR payload:
   certificate_hash: String,
   pin: String,
   protocol_version: Number,
-  sender_show_hash: Booolean
+  sender_show_hash: Boolean
 }
 ```
 
