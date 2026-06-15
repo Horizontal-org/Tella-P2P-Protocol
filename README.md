@@ -42,9 +42,11 @@ Self-signed TLS certificates are generated and used on both sides of the connect
 establish a mutual TLS (mTLS) connection: the sender verifies the receiver, and
 the receiver verifies the sender.
 
-In this document we call the fingerprint identifying the sender's certificate as the Sender
-Certificate Hash. In the same way the receiver's certificate is identified by the Receiver
-Certificate Hash.
+Certificate verification is done by comparing certificate fingerprints on both sides of the
+connection. The fingerprints are derived by SHA256-hashing certificate information and
+representing the resulting hash as a hexadecimal string. Accordingly in this document we call
+the fingerprint identifying the sender's certificate the Sender Certificate Hash. In the
+same way the receiver's certificate is identified by the Receiver Certificate Hash.
 
 Certificates are generated and used per session, being discarded when a session ends.
 
