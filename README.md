@@ -38,10 +38,13 @@ Nearby Sharing in Tella was designed for contexts of repression and surveillance
 The TLS versions in use are TLS1.2 and TLS1.3. Implementations pick the highest version
 supported by both sender and receiver.
 
-
 Self-signed TLS certificates are generated and used on both sides of the connection to
 establish a mutual TLS (mTLS) connection: the sender verifies the receiver, and
 the receiver verifies the sender.
+
+In this document we call the fingerprint identifying the sender's certificate as the Sender
+Certificate Hash. In the same way the receiver's certificate is identified by the Receiver
+Certificate Hash.
 
 Certificates are generated and used per session, being discarded when a session ends.
 
