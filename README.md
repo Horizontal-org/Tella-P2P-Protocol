@@ -278,8 +278,8 @@ through a mix of QR code scanning and manual verification of connection
 information.  This creates the following four scenarios:
 
 * A. 100% QR flow
-* B. Receiver displays QR code + Sender Hash Verification
-* C. Sender displays QR code + Receiver Hash Verification 
+* B. Receiver QR code + Sender Hash Verification
+* C. Sender QR code + Receiver Hash Verification 
 * D. Receiver Hash Verification + Sender Hash Verification (0% QR codes)
 
 **A: Receiver can scan / Sender can scan (100% QR flow)**
