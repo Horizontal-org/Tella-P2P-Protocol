@@ -284,7 +284,7 @@ information.  This creates the following four scenarios:
 
 **A: Receiver can scan / Sender can scan (100% QR flow)**
 
-1. Receiver scans Sender QR Code (no requests have been sent). Receiver pins Sender Certificate Hash.
+1. Receiver scans Sender QR code (no requests have been sent). Receiver pins Sender Certificate Hash.
 2. Sender scans Receiver QR code (still no requests have been sent). Sender pins Receiver Certificate Hash.
    * mTLS is now established
 3. Sender sends `POST /api/v2/register` (this is request 1)
@@ -302,7 +302,7 @@ information.  This creates the following four scenarios:
 
 **C: Receiver can scan / Sender cannot scan flow (Receiver Hash Verification)**
 
-1. Receiver scans Sender QR Code (no requests have been sent). Receiver pins Sender Certificate Hash.
+1. Receiver scans Sender QR code (no requests have been sent). Receiver pins Sender Certificate Hash.
 2. Sender does manual connection, types in Receiver IP Address, PIN, Port. Sender sends `POST /api/v2/ping` (this is request 1)
 3. Receiver sends back ping response. 
 4. Sender extracts Receiver Certificate Hash from ping response.
