@@ -582,6 +582,7 @@ code that may be sent back as a response from receivers running a newer incompat
 version:
 
 |HTTP code|Message|
+|--|--|
 |406|Unsupported version|
 
 As documented above in the protocol, this error code may be sent on the following routes:
