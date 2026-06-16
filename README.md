@@ -73,24 +73,18 @@ The receiver device displays a QR code containing:
 * Receiver Certificate Hash
 * Connection PIN
 * Protocol version number
-* Whether sender in step 2 of section *New flow* should directly show hash verification
 
 QR payload:
 
 ```json5
 {
-  ip_address: [String, ..., ..., String],
-  port: Number,
-  certificate_hash: String,
-  pin: String,
-  protocol_version: Number,
-  sender_show_hash: Boolean
+  "ip_address": [String, ..., ..., String],
+  "port": Number,
+  "certificate_hash": String,
+  "pin": String,
+  "protocol_version": Number
 }
 ```
-
-If for example the receiver is a desktop client, `sender_show_hash` should be set to `true` and
-sender in step 2 in section *New flow* should skip display of the QR code and directly show the
-hash verification screen.
 
 For the protocol described in the current document, the protocol version should be set to
 `protocol_version: 2`
@@ -108,7 +102,7 @@ QR payload:
 
 ```json5
 {
-  certificate_hash: String
+  "certificate_hash": String
 }
 ```
 
@@ -154,11 +148,15 @@ This endpoint initiates a secure handshake between two devices during the manual
 
 Response payload
 
-```markdown
+```json5
 {
-  "senderShowHash": boolean
+  "senderShowHash": Boolean
 }
 ```
+
+If for example the receiver is a desktop client, `senderShowHash` should be set to `true` and
+sender in step 2 in section *New flow* should skip display of the QR code and directly show the
+hash verification screen.
 
 Errors:
 
@@ -191,17 +189,17 @@ response should also be rejected.
 
 Request payload
 
-```markdown 
+```json5 
 {
-  pin: "123456",
-  nonce: "random-uuid-number",
+  "pin": "123456",
+  "nonce": "random-uuid-number",
 }
 ```
 
 
 Response payload
 
-```markdown
+```json5
 {
   "sessionId": "uuid-session-identifier"
 }
@@ -534,8 +532,8 @@ if !sessionValid(request.sessionID) || seen[request.nonce] {
 Offline peer-to-peer protocols provide unique opportunities for enabling long-lasting
 applications. This presents a difficulty in terms of navigating incompatible versions. 
 
-Protocol version 2 (this document) is wholly incompatible with version 1 due to the
-introduction of compulsory mTLS.
+Protocol version 2 (this document) is wholly incompatible with version 1 (previous version of
+this document) due to the introduction of compulsory mTLS.
 
 ### Handling version 1 and version 2 incompatibility
 
@@ -552,17 +550,17 @@ For describing senders and receivers on different version, we use the following 
 Version 1 and version 2 incompatibility can be detected in the following situations and should be
 reacted to as described below. 
 
-1. Sender-v2 scans a version 1 Receiver QR code. The sender can detect the situation by the
-   lack of `protocol_version` in the Receiver QR code.
+1. Sender-v2 scans a Receiver-v1 QR code. The sender can detect the situation by the
+   lack of `protocol_version` in the Receiver-v1 QR code.
 	* Sender should not send a register request to the receiver. 
     * Sender should instead display the Incompatible Versions Message on the screen with
       information saying that the receiver is running an older, incompatible version.
-2. Receiver-v2 receives any requests with the route prefix `/api/v1/`. It should, if
-   possible, respond with a suitable error code that is known to be implemented by a Sender-v1. In particular:
+2. Receiver-v2 receives any requests with the route prefix `/api/v1/` for known routes (ping,
+   register). The receiver should, if possible, respond with a suitable error code that is
+   known to be implemented by a Sender-v1. In particular:
     1. Requests for `/api/v1/register` should return `403 Rejected` to Sender-v1. Receiver-v2
        should display the Incompatible Versions Message on its screen, saying that the sender
-       was running the older version. This occurs when a Sender-v1 scans a version 2
-       Receiver QR code.
+       was running the older version. This occurs when a Sender-v1 scans a Receiver-v2 QR code.
     2. Requests for `/api/v1/ping` should be ignored (error code 429 is not suitable). When
      receiving version 1 ping requests and a mTLS connection has not yet been established,
      Receiver-v2 should display the Incompatible Versions Message.
