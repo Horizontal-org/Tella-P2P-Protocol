@@ -43,10 +43,11 @@ establish a mutual TLS (mTLS) connection: the sender verifies the receiver, and
 the receiver verifies the sender.
 
 Certificate verification is done by comparing certificate fingerprints on both sides of the
-connection. The fingerprints are derived by SHA256-hashing certificate information and
-representing the resulting hash as a hexadecimal string. Accordingly in this document we call
-the fingerprint identifying the sender's certificate the Sender Certificate Hash. In the
-same way the receiver's certificate is identified by the Receiver Certificate Hash.
+connection. The fingerprints are derived by SHA256-hashing the raw bytes of the certificate
+attached to a request/response and representing the resulting hash as a hexadecimal string.
+Accordingly in this document we call the fingerprint identifying the sender's certificate the
+Sender Certificate Hash. In the same way the receiver's certificate is identified by the
+Receiver Certificate Hash.
 
 Certificates are generated and used per session, being discarded when a session ends.
 
@@ -228,7 +229,7 @@ Errors:
 
 The security of mTLS amounts to each side of a connection being secured by a TLS certificate
 belonging to an authorized party. Since this protocol relies on the use of self-signed
-certificates, the certificates have to be verified. In this protocol, verification is done
+certificates, the certificates have to be verified. Verification is done
 either automatically (out-of-band QR code transmission of certificate fingerprint) or through
 manual visual inspection of a certificate fingerprint. Once a certificate has been verified,
 the fingerprint is saved and used to compare against future traffic, verifying the traffic
