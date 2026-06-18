@@ -278,8 +278,7 @@ When Device B (receiver) cannot scan Sender QR code (broken screen/camera or com
 * Device A (sender) sends register request payload outlined in *3.2- Initial Registration*.
 * Device A (sender) displays the hash of their TLS certificate.
 * Device B (receiver) processes registration request, making sure that PIN is correct and nonce has not.
-  been seen (**Note:** this must happen before extracting certificate information in next
-  step).
+  been seen (**Note:** Sender Certificate Hash must not be displayed before having verified the PIN is correct & nonce unseen).
 * Device B (receiver) extracts the sender's certificate information from the connection info of the registration request, hashes it, and displays the Sender Certificate Hash.
 * Device A (sender) and Device B (receiver) visually compare the hashes as outlined in *2.3- Verification screen*.
 * If verification succeds, Device B (receiver) pins the Sender Certificate Hash.
