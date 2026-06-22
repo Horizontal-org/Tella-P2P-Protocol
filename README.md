@@ -180,7 +180,9 @@ ping response payload.
 
 For QR code authentication, registration is performed immediately after the QR code has been scanned.
 
-For manual authentication, registration is performed after the ping request and once the sender has verified the receiver certificate hash.
+For manual authentication, registration is performed after the ping request and once the sender
+has verified the Receiver Certificate Hash. The receiver sends its ping response after
+verification of the Receiver Certificate Hash.
 
 The sender should only generate one certificate and use that certificate for configuring the sender's TLS client.
 
@@ -327,27 +329,27 @@ the other device.
 
 1. Receiver scans Sender QR code (no requests have been sent). Receiver pins Sender Certificate Hash.
 2. Sender does manual connection, types in Receiver IP Address, PIN, Port. Sender sends `POST /api/v2/ping` (this is request 1).
-3. Receiver sends back ping response. 
-4. Sender extracts Receiver Certificate Hash from ping response.
-5. Receiver Hash Verification commences.
-6. Both parties confirm Receiver Hash and continue. Sender pins Receiver Certificate Hash.
+3. Sender extracts Receiver Certificate Hash from ping response.
+4. Receiver Hash Verification commences.
+5. Both parties confirm Receiver Hash and continue. Sender pins Receiver Certificate Hash.
    *  mTLS is now established.
+6. Receiver sends back ping response. 
 7. Sender sends `POST /api/v2/register` (this is request 2).
 
 **D: Receiver cannot scan / Sender cannot scan (Receiver Hash Verification and Sender Hash Verification; 0% QR codes)**
 
 1. Receiver marks that they can't scan QR codes.
 2. Sender does manual connection, types in Receiver IP Address, PIN, Port. Sender sends `POST /api/v2/ping` (this is request 1).
-3. Receiver sends back ping response. 
-4. Sender extracts Receiver Certificate Hash from response.
-5. Receiver Hash Verification commences.
-6. Both parties confirm Receiver Hash and continue. Sender pins Receiver Certificate Hash.
-8. Sender sends `POST /api/v2/register` (this is request 2).
-9. Receiver confirms PIN correct and nonce unseen. Receiver extracts Sender Certificate Hash from register request.
-10. Sender Hash Verification commences.
-11. Both parties confirm Sender Hash and continue. Receiver pins Sender Certificate Hash.
+3. Sender extracts Receiver Certificate Hash from response.
+4. Receiver Hash Verification commences.
+5. Both parties confirm Receiver Hash and continue. Sender pins Receiver Certificate Hash.
+6. Receiver sends back ping response. 
+7. Sender sends `POST /api/v2/register` (this is request 2).
+8. Receiver confirms PIN correct and nonce unseen. Receiver extracts Sender Certificate Hash from register request.
+9. Sender Hash Verification commences.
+10. Both parties confirm Sender Hash and continue. Receiver pins Sender Certificate Hash.
 	* mTLS is now established.
-12. Receiver sends register response back to sender.
+11. Receiver sends register response back to sender.
 
 ## 4- File Transfer
 
