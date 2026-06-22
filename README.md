@@ -8,11 +8,11 @@ This repository describes the peer-to-peer file sharing protocol implemented by 
 
 
 ## Platform and availability
-Nearby Sharing will be available for [Tella Android](https://github.com/Horizontal-org/Tella-Android), [Tella iOS](https://github.com/Horizontal-org/Tella-iOS) and [Tella Desktop](https://github.com/Horizontal-org/Tella-Desktop), but it's still under development.
+Nearby Sharing is available for [Tella Android](https://github.com/Horizontal-org/Tella-Android), [Tella iOS](https://github.com/Horizontal-org/Tella-iOS) and [Tella Desktop](https://github.com/Horizontal-org/Tella-Desktop).
 
-The feature is still in alpha, and it's currently being audited by an independent security firm. It will be launched to production only after the priority security fixes are implemented.
+The feature has been audited by an independent security firm.
 
-User facing documentation about the feature is available here: https://beta.tella-app.org/nearby-sharing
+User facing documentation about the feature is available here: https://tella-app.org/nearby-sharing
 
 ## Credits
 This protocol (and Nearby Sharing feature in Tella in general) is inspired by the [LocalSend project](https://github.com/localsend/localsend), and it uses the local network Wi-Fi without needing an internet connection. 
@@ -44,10 +44,10 @@ the receiver verifies the sender.
 
 Certificate verification is done by comparing certificate fingerprints on both sides of the
 connection. The fingerprints are derived by SHA256-hashing the raw bytes of the certificate
-attached to a request/response and representing the resulting hash as a hexadecimal string.
-Accordingly in this document we call the fingerprint identifying the sender's certificate the
-Sender Certificate Hash. In the same way the receiver's certificate is identified by the
-Receiver Certificate Hash.
+information attached to a request/response and representing the resulting hash as a hexadecimal
+string.  Accordingly in this document we call the fingerprint identifying the sender's
+certificate the Sender Certificate Hash. In the same way the receiver's certificate is
+identified by the Receiver Certificate Hash.
 
 Certificates are generated and used per session, being discarded when a session ends.
 
@@ -65,7 +65,7 @@ Requests for unknown or concluded transfer sessions should be rejected.
 
 ### 2.1- QR authentication (primary method)
 
-#### 2.1.1 Receiver QR code
+#### 2.1.1- Receiver QR code
 
 The receiver device displays a QR code containing:
 
@@ -93,7 +93,7 @@ For the protocol described in the current document, the protocol version should 
 **Note:** `ip_address` is a list of strings, as the receiver may have many different local IP
 addresses.
 
-#### 2.1.2 Sender QR code
+#### 2.1.2- Sender QR code
 
 The sender device displays a QR code containing:
 
@@ -122,7 +122,7 @@ After entering the connection information, both the sender and the receiver will
 When manually verifying a certificate on either side of the connection, both sender and
 receiver will display a verification screen containing an alphanumeric sequence that encodes
 the certificate hash being verified (either Receiver Certificate Hash or Sender Certificate
-Hash, depending on the steps outlined in section *Flow*).
+Hash, depending on the steps outlined in section *3.2.1- Flow*).
 
 Both parties will verify that the same sequence is shown on each device before proceeding.
 
@@ -161,7 +161,7 @@ Response payload
 ```
 
 If for example the receiver is a desktop client, `senderShowHash` should be set to `true` and
-sender in step 2 in section *Flow* should skip display of the QR code and directly show the
+sender in step 2 in section *3.2.1- Flow* should skip display of the QR code and directly show the
 hash verification screen.
 
 Errors:
@@ -225,7 +225,7 @@ Errors:
 |429|Too many requests|
 |500|Server error|
 
-#### Flow
+#### 3.2.1- Flow
 
 The security of mTLS amounts to each side of a connection being secured by a TLS certificate
 belonging to an authorized party. Since this protocol relies on the use of self-signed
@@ -268,7 +268,7 @@ Certificate Hash.
 
 When Device B (receiver) can scan Sender QR code: 
 
-* Device A (sender) presents QR code containing the sender's certificate hash outlined in *2.1.2 Sender QR code*.
+* Device A (sender) presents QR code containing the sender's certificate hash outlined in *2.1.2- Sender QR code*.
 * Device B (receiver) scans QR code, parses information, and pins the embedded Sender Certificate Hash.
 * Device A (sender) sends register request payload outlined in *3.2- Initial Registration*.
 * Device B (receiver) processes registration request, making sure that PIN is correct and nonce has not been seen.
@@ -290,7 +290,7 @@ After Device B (receiver) has pinned the Sender Certificate Hash, Device B
 request sent after register, Device B (receiver) hashes the certificate information from
 the connection and checks the computed hash against the pinned Sender Certificate Hash.
 
-#### Connection scenarios
+#### 3.2.2- Connection scenarios
 
 Connection establishment and exchange of certification information can be done
 through a mix of QR code scanning and manual verification of connection
@@ -548,8 +548,6 @@ reacted to as described below.
    prefix `/api/v2`; requests to these routes may not receive any response. This occurs when a
    Sender-v2 tries to manually connect to a Receiver-v1 i.e. it concerns the *Initial Ping*
    used by the manual connection process.
-      * TODO: should the handling behaviour be to have a timeout before displaying "no
-        response; maybe incompatible version?" how do android/ios handle this in v1?
 
 ### How version 2 and future versions handle incompatibilities
 
